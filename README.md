@@ -2,4 +2,4 @@
 A nopixel like dispatch system coded in VueJS and jQuery
 
 # Tutorial
-Go to the fivem forum post: link to be added
+https://forum.cfx.re/t/esx-free-dispatch-notifications/2436835
