@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dispatcher</title>
+    <link href="css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <div class="dispatches-container" :style="showing_list ? 'overflow-x: hidden' : 'overflow: hidden'">
+            <div v-if="!showing_list">
+                <div v-for="(elem, key) in dispatchList" :key="elem.id" class="dispatch-container fade-left-enter" :id="elem.id" :class="['priority-' + elem.priority]">
+                    <div class="dispatch-background" :class="{ blink: elem.priority == 2 }">
+                        <div class="dispatch-header">
+                            <div class="dispatch-code-container">
+                                <div class="dispatch-code-content">{{ elem.code }}</div>
+                            </div>
+                            <div class="dispatch-title">{{ elem.title }}</div>
+                        </div>
+                        <div class="dispatch-middle-divider"></div>
+                        <i class="dispatch-gps-icon fas fa-map-marker-alt" v-on:click="SetGPSPosition(elem)"></i>
+                        <div class="dispatch-body">
+                            <div class="dispatch-officer-title">Requesting Officer: </div>
+                            <div class="dispatch-officer-content">{{ elem.officer }}</div>
+                            <div class="dispatch-street-title">Street: </div>
+                            <div class="dispatch-street-content">{{ elem.street }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else>
+                <div v-for="(elem, key) in cacheDispatch" :key="elem.id" class="dispatch-container" :class="['priority-' + elem.priority, {blink: elem.priority == 2}]">
+                    <div class="dispatch-header">
+                        <div class="dispatch-code-container">
+                            <div class="dispatch-code-content">{{ elem.code }}</div>
+                        </div>
+                        <div class="dispatch-title">{{ elem.title }}</div>
+                    </div>
+                    <div class="dispatch-middle-divider"></div>
+                    <i class="dispatch-gps-icon fas fa-map-marker-alt" v-on:click="SetGPSPosition(elem)"></i>
+                    <div class="dispatch-body">
+                        <div class="dispatch-officer-title">Requesting Officer: </div>
+                        <div class="dispatch-officer-content">{{ elem.officer }}</div>
+                        <div class="dispatch-street-title">Street: </div>
+                        <div class="dispatch-street-content">{{ elem.street }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons-container" :style="showing_list ? 'opacity: 1' : ''">
+            <button
+                type="submit"
+                class="dispatch-generic-button"
+                v-on:click="ClearAllDispatch()"
+            >Delete dispatches</button>
+
+            <button
+                type="submit"
+                class="dispatch-generic-button"
+                v-on:click="DisableNotifications()"
+            >Toggle dispatches</button>
+        </div>
+    </div>
+
+    <script src="js/vue.min.js"></script>
+    <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+    <script src="js/script.js"></script>    
+</body>
+
+</html>
