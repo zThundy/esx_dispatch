@@ -2,10 +2,11 @@ ESX = nil
 
 local disableNotifications = false
 local blips = {}
+local cachedBlips = {}
 
 Citizen.CreateThread(function()
 	while ESX == nil do
-        TriggerEvent("esx:getSharedObject", function(obj) ESX = obj end)
+        ESX = exports["es_extended"]:getSharedObject()
 		Citizen.Wait(100)
 	end
 
@@ -28,33 +29,37 @@ AddEventHandler("esx:setJob", function(job) ESX.PlayerData.job = job end)
 
 RegisterNetEvent('dispatch:clNotify')
 AddEventHandler('dispatch:clNotify', function(data)
-    data.priority = tonumber(data.priority)
+    if data.priority == 1 then
+        TriggerEvent("InteractSound_CL:PlayOnOne", "10-1315", 0.6)
 
-    if not disableNotifications then
-        if data.priority == 1 then
-            if Config.PlaySound then
-                TriggerEvent("InteractSound_CL:PlayOnOne", "10-1315", 0.6)
-            end
-    
-            if Config.ShowDispatchBlip then
-                CreateBlip(data)
-            end
+        if data.blipname then
+            CreateBlip(data)
         end
-    
-        if data.priority == 2 then
-            if Config.PlaySound then
-                TriggerEvent("InteractSound_CL:PlayOnOne", "10-1314", 0.6)
-            end
-            
-            if Config.ShowDispatchBlip then
-                CreateBlip(data)
-            end
-        end
+    end
 
-        SendNUIMessage({
-            type = "addNewNotification",
-            notification = data
-        })
+    if data.priority == 2 then
+        TriggerEvent("InteractSound_CL:PlayOnOne", "10-1314", 0.6)
+        
+        if data.blipname then
+            CreateBlip(data)
+        end
+    end
+
+    if data.priority == 3 then
+        TriggerEvent("InteractSound_CL:PlayOnOne", "10-1315", 0.6)
+        
+        if data.blipname then
+            CreateBlip(data)
+        end
+    end
+
+    if ESX.PlayerData.job.name == 'police' then
+        if not disableNotifications then
+            SendNUIMessage({
+                type = "addNewNotification",
+                notification = data
+            })
+        end
     end
 end)
 
@@ -68,18 +73,19 @@ Citizen.CreateThread(function()
     
     while true do
         Citizen.Wait(0)
-
-        if IsControlJustReleased(0, 256) and ESX.PlayerData.job.name == 'police' then
-            if not showDispatchLog then
+        
+        if not showDispatchLog then
+            if IsControlJustReleased(0, 256) and ESX.PlayerData.job.name == 'police' then
                 showDispatchLog = true
+                -- SetPauseMenuActive(not showDispatchLog)
                 SetNuiFocus(showDispatchLog, showDispatchLog)
                 SetNuiFocusKeepInput(showDispatchLog)
 
                 SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
                 StartLoopThread()
-            else
-                Citizen.Wait(1000)
             end
+        else
+            Citizen.Wait(1000)
         end
     end
 end)
@@ -95,10 +101,15 @@ function StartLoopThread()
             DisableAllControlActions(1)
             DisableAllControlActions(2)
             DisablePlayerFiring(GetPlayerPed(-1), true) -- Disable weapon firing
-            
-            if IsControlJustReleased(0, 200) or IsDisabledControlJustReleased(0, 200) then
+            DisableControlAction(0, 200, true)
+            DisableControlAction(0, 177, true)
+            DisableControlAction(0, 202, true)
+            DisableControlAction(0, 322, true)
+
+            if IsDisabledControlJustPressed(0, 200) or IsDisabledControlJustPressed(0, 194) then
                 if showDispatchLog then
                     showDispatchLog = false
+                    -- SetPauseMenuActive(not showDispatchLog)
                     SetNuiFocus(showDispatchLog, showDispatchLog)
                     SetNuiFocusKeepInput(showDispatchLog)
 
@@ -123,30 +134,13 @@ function CreateBlip(data)
     AddTextComponentString(data.blipname)
     EndTextCommandSetBlipName(blips[data.id])
 
+    table.insert(cachedBlips, blips[data.id])
+
     Citizen.CreateThreadNow(function()
         local storedId = data.id
         Citizen.Wait(data.fadeOut * 1000)
 
         RemoveBlip(blips[storedId])
-    end)
-end
-
-function GetStreetAndZone()
-	local plyPos = GetEntityCoords(PlayerPedId(), true)
-	local s1, s2 = Citizen.InvokeNative(0x2EB41072B4C1E4C0, plyPos.x, plyPos.y, plyPos.z, Citizen.PointerValueInt(), Citizen.PointerValueInt())
-	local street1 = GetStreetNameFromHashKey(s1)
-	local street2 = GetStreetNameFromHashKey(s2)
-	local zone = GetLabelText(GetNameOfZone(plyPos.x, plyPos.y, plyPos.z))
-	local street = street1 .. ", " .. zone
-	return street
-end
-
-function randomId()
-    math.randomseed(GetCloudTimeAsInt())
-    local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-    return string.gsub(template, '[xy]', function (c)
-        local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
-        return string.format('%x', v)
     end)
 end
 
@@ -169,56 +163,16 @@ end)
 
 RegisterNUICallback('disableNotifications', function(data, cb)
     disableNotifications = not disableNotifications
-    if disableNotifications then
-        ESX.ShowNotification("~g~Dispatches are now enabled")
-    else
-        ESX.ShowNotification("~r~Dispatches are now disabled")
-    end
     cb("ok")
 end)
 
 RegisterNUICallback('clearNotifications', function(data, cb)
-    for _, blip in pairs(blips) do
+    for _, blip in pairs(cachedBlips) do
         if DoesBlipExist(blip) then
             RemoveBlip(blip)
         end
     end
-    blips = {}
+    cachedBlips = {}
 
     cb("ok")
-end)
-
---------------------------------
------------ COMMANDS -----------
---------------------------------
-
-RegisterCommand("dispatch", function(source, args)
-    local priority = args[1]
-    local message = ""
-    for i = 2, #args do
-        message = message .. " " .. args[i]
-    end
-
-    local coords = GetEntityCoords(GetPlayerPed(-1))
-
-    local dispatch = {
-        code = "10-40",
-        street = GetStreetAndZone(),
-        id = randomId(),
-        priority = priority,
-        title = message,
-        position = {
-            x = coords.x,
-            y = coords.y,
-            z = coords.z
-        },
-        blipname = "Test dispatch",
-        color = 2,
-        sprite = 304,
-        fadeOut = 30,
-        duration = 10000,
-        officer = "Test officername"
-    }
-
-    TriggerServerEvent("dispatch:svNotify", dispatch)
 end)

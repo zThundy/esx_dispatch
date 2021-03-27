@@ -1,15 +1,10 @@
-ESX = nil
-TriggerEvent("esx:getSharedObject", function(obj) ESX = obj end)
+ESX = exports["es_extended"]:getSharedObject()
 
 RegisterServerEvent('dispatch:svNotify')
 AddEventHandler('dispatch:svNotify', function(data)
-    local xPlayer
+    local jobPlayers = ESX.GetPlayersWithJob("police")
 
-    for _, v in pairs(ESX.GetPlayers()) do
-        xPlayer = ESX.GetPlayerFromId(v)
-
-        if Config.ReceivingMessagesJob[xPlayer.job.name] then
-            TriggerClientEvent('dispatch:clNotify', v, data)
-        end
+    for _, v in pairs(jobPlayers) do
+        TriggerClientEvent('dispatch:clNotify', v, data)
     end
 end)

@@ -179,6 +179,11 @@ body {
     border-right: 5px solid #bd2f25;
 }
 
+.priority-3 {
+    background: rgba(132, 21, 21, .76);
+    border-right: 5px solid #bd2f25;
+}
+
 .fade-left-enter {
     animation: slide-to-left .3s ease-in;
 }

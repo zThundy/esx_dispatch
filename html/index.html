@@ -23,9 +23,9 @@
                         <div class="dispatch-middle-divider"></div>
                         <i class="dispatch-gps-icon fas fa-map-marker-alt" v-on:click="SetGPSPosition(elem)"></i>
                         <div class="dispatch-body">
-                            <div class="dispatch-officer-title">Requesting Officer: </div>
+                            <div class="dispatch-officer-title">Agente richiedente: </div>
                             <div class="dispatch-officer-content">{{ elem.officer }}</div>
-                            <div class="dispatch-street-title">Street: </div>
+                            <div class="dispatch-street-title">Strada: </div>
                             <div class="dispatch-street-content">{{ elem.street }}</div>
                         </div>
                     </div>
@@ -43,9 +43,9 @@
                     <div class="dispatch-middle-divider"></div>
                     <i class="dispatch-gps-icon fas fa-map-marker-alt" v-on:click="SetGPSPosition(elem)"></i>
                     <div class="dispatch-body">
-                        <div class="dispatch-officer-title">Requesting Officer: </div>
+                        <div class="dispatch-officer-title">Agente richiedente: </div>
                         <div class="dispatch-officer-content">{{ elem.officer }}</div>
-                        <div class="dispatch-street-title">Street: </div>
+                        <div class="dispatch-street-title">Strada: </div>
                         <div class="dispatch-street-content">{{ elem.street }}</div>
                     </div>
                 </div>
@@ -57,13 +57,13 @@
                 type="submit"
                 class="dispatch-generic-button"
                 v-on:click="ClearAllDispatch()"
-            >Delete dispatches</button>
+            >Elimina notifiche</button>
 
             <button
                 type="submit"
                 class="dispatch-generic-button"
                 v-on:click="DisableNotifications()"
-            >Toggle dispatches</button>
+            >Attiva / Disattiva notifiche</button>
         </div>
     </div>
 
