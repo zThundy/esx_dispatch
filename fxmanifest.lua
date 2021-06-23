@@ -1,6 +1,9 @@
 fx_version "cerulean"
 game "gta5"
 
+version "2.0.0"
+author "zThundy__"
+
 ui_page 'html/index.html'
 
 files {
@@ -18,4 +21,9 @@ client_scripts {
 server_script {
     '@mysql-async/lib/MySQL.lua',
     'server/*.lua'
+}
+
+dependencies {
+    "es_extended",
+    
 }

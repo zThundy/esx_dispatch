@@ -6,14 +6,19 @@ local cachedBlips = {}
 
 Citizen.CreateThread(function()
 	while ESX == nil do
-        ESX = exports["es_extended"]:getSharedObject()
+        TriggerEvent("esx:getSharedObject", function(obj) ESX = obj end)
 		Citizen.Wait(100)
 	end
+
+    while ESX.GetPlayerData().job == nil do Citizen.Wait(500) end
+    ESX.PlayerData = ESX.GetPlayerData()
 
     SendNUIMessage({
         type = "sendResourceName",
         resource = GetCurrentResourceName()
     })
+
+    InitScript()
 end)
 
 RegisterNetEvent("esx:playerLoaded")
@@ -53,13 +58,11 @@ AddEventHandler('dispatch:clNotify', function(data)
         end
     end
 
-    if ESX.PlayerData.job.name == 'police' then
-        if not disableNotifications then
-            SendNUIMessage({
-                type = "addNewNotification",
-                notification = data
-            })
-        end
+    if not disableNotifications then
+        SendNUIMessage({
+            type = "addNewNotification",
+            notification = data
+        })
     end
 end)
 
@@ -67,28 +70,27 @@ end)
 ----------- SHOW LIST THREAD -----------
 ----------------------------------------
 
-Citizen.CreateThread(function()
-    while ESX.GetPlayerData().job == nil do Citizen.Wait(1000) end
-    ESX.PlayerData = ESX.GetPlayerData()
-    
-    while true do
-        Citizen.Wait(0)
-        
-        if not showDispatchLog then
-            if IsControlJustReleased(0, 256) and ESX.PlayerData.job.name == 'police' then
-                showDispatchLog = true
-                -- SetPauseMenuActive(not showDispatchLog)
-                SetNuiFocus(showDispatchLog, showDispatchLog)
-                SetNuiFocusKeepInput(showDispatchLog)
+function InitScript()
+    Citizen.CreateThread(function()
+        while true do
+            Citizen.Wait(0)
 
-                SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
-                StartLoopThread()
+            if not showDispatchLog and (Config.EnableWhitelistedJobs and Config.WhitelistedJobs[ESX.PlayerData.job.name] or true) then
+                if IsControlJustReleased(0, 256) then
+                    showDispatchLog = true
+                    -- SetPauseMenuActive(not showDispatchLog)
+                    SetNuiFocus(showDispatchLog, showDispatchLog)
+                    SetNuiFocusKeepInput(showDispatchLog)
+
+                    SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
+                    StartLoopThread()
+                end
+            else
+                Citizen.Wait(1500)
             end
-        else
-            Citizen.Wait(1000)
         end
-    end
-end)
+    end)
+end
 
 ---------------------------------
 ----------- FUNCTIONS -----------
@@ -149,7 +151,6 @@ end
 -------------------------------------
 
 RegisterNUICallback('setGPSPosition', function(data, cb)
-    -- print(json.encode(data))
     SetNewWaypoint(data.position.x, data.position.y)
     cb("ok")
 end)
