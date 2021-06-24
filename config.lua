@@ -68,8 +68,7 @@ Config.WhitelistedJobs = {
     function randomId()
         math.randomseed(GetCloudTimeAsInt())
 		return string.gsub("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx", "[xy]", function(c)
-			local v = (c == "x") and math.random(0, 0xf) or math.random(8, 0xb)
-			return string.format("%x", v)
+			return string.format("%x", (c == "x") and math.random(0, 0xf) or math.random(8, 0xb))
 		end)
     end
 
@@ -78,8 +77,7 @@ Config.WhitelistedJobs = {
     function randomId()
         math.randomseed(os.time())
 		return string.gsub("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx", "[xy]", function(c)
-			local v = (c == "x") and math.random(0, 0xf) or math.random(8, 0xb)
-			return string.format("%x", v)
+			return string.format("%x", (c == "x") and math.random(0, 0xf) or math.random(8, 0xb))
 		end)
     end
 ]]
