@@ -7,8 +7,8 @@ Config.EnableWhitelistedJobs = true
 -- this will be the list of jobs that will be able to receive
 -- notifications if the above is enabled
 Config.WhitelistedJobs = {
-	["police"] = true,
-	["ambulance"] = true
+    ["police"] = true,
+    ["ambulance"] = true
 }
 
 --[[
