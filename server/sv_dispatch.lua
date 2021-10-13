@@ -6,7 +6,7 @@ local function GetPlayersWithJob(job)
     for _, source in pairs(ESX.GetPlayers()) do
         local xPlayer = ESX.GetPlayerFromId(source)
         if xPlayer and xPlayer.job.name == job then
-            table.insert(xPlayers, xPlayer)
+            table.insert(xPlayers, xPlayer.source)
         end
     end
     return xPlayers
