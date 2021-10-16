@@ -17,8 +17,6 @@ Citizen.CreateThread(function()
         type = "sendResourceName",
         resource = GetCurrentResourceName()
     })
-
-    InitScript()
 end)
 
 RegisterNetEvent("esx:playerLoaded")
@@ -67,30 +65,21 @@ AddEventHandler('dispatch:clNotify', function(data)
 end)
 
 ----------------------------------------
------------ SHOW LIST THREAD -----------
+----------- KEYMAPPING -----------
 ----------------------------------------
 
-function InitScript()
-    Citizen.CreateThread(function()
-        while true do
-            Citizen.Wait(0)
+RegisterKeyMapping("opendispatch", "Open Dispatch UI", 'keyboard', "F9")
+RegisterCommand("opendispatch", function()
+if not showDispatchLog and (Config.EnableWhitelistedJobs and Config.WhitelistedJobs[ESX.PlayerData.job.name] or true) then
+    showDispatchLog = true
+    -- SetPauseMenuActive(not showDispatchLog)
+    SetNuiFocus(showDispatchLog, showDispatchLog)
+    SetNuiFocusKeepInput(showDispatchLog)
 
-            if not showDispatchLog and (Config.EnableWhitelistedJobs and Config.WhitelistedJobs[ESX.PlayerData.job.name] or true) then
-                if IsControlJustReleased(0, 256) then
-                    showDispatchLog = true
-                    -- SetPauseMenuActive(not showDispatchLog)
-                    SetNuiFocus(showDispatchLog, showDispatchLog)
-                    SetNuiFocusKeepInput(showDispatchLog)
-
-                    SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
-                    StartLoopThread()
-                end
-            else
-                Citizen.Wait(1500)
-            end
-        end
-    end)
-end
+    SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
+    StartLoopThread()
+    end
+end)
 
 ---------------------------------
 ----------- FUNCTIONS -----------
