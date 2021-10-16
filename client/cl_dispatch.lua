@@ -5,10 +5,10 @@ local blips = {}
 local cachedBlips = {}
 
 Citizen.CreateThread(function()
-	while ESX == nil do
+    while ESX == nil do
         TriggerEvent("esx:getSharedObject", function(obj) ESX = obj end)
-		Citizen.Wait(100)
-	end
+	Citizen.Wait(100)
+    end
 
     while ESX.GetPlayerData().job == nil do Citizen.Wait(500) end
     ESX.PlayerData = ESX.GetPlayerData()
@@ -70,14 +70,14 @@ end)
 
 RegisterKeyMapping("opendispatch", "Open Dispatch UI", 'keyboard', "F9")
 RegisterCommand("opendispatch", function()
-if not showDispatchLog and (Config.EnableWhitelistedJobs and Config.WhitelistedJobs[ESX.PlayerData.job.name] or true) then
-    showDispatchLog = true
-    -- SetPauseMenuActive(not showDispatchLog)
-    SetNuiFocus(showDispatchLog, showDispatchLog)
-    SetNuiFocusKeepInput(showDispatchLog)
+    if not showDispatchLog and (Config.EnableWhitelistedJobs and Config.WhitelistedJobs[ESX.PlayerData.job.name] or true) then
+        showDispatchLog = true
+        -- SetPauseMenuActive(not showDispatchLog)
+        SetNuiFocus(showDispatchLog, showDispatchLog)
+        SetNuiFocusKeepInput(showDispatchLog)
 
-    SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
-    StartLoopThread()
+        SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
+        StartLoopThread()
     end
 end)
 
