@@ -65,7 +65,7 @@ AddEventHandler('dispatch:clNotify', function(data)
 end)
 
 ----------------------------------------
------------ KEYMAPPING -----------
+-------------- KEYMAPPING --------------
 ----------------------------------------
 
 RegisterKeyMapping("opendispatch", "Open Dispatch UI", 'keyboard', "F9")
@@ -107,6 +107,10 @@ function StartLoopThread()
                     SendNUIMessage({ type = "showOldNotifications", show = showDispatchLog })
                 end
             end
+				
+	    if not showDispatchLog then
+		return
+	    end
 
             Citizen.Wait(0)
         end
